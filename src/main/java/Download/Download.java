@@ -41,7 +41,7 @@ public class Download extends Thread {
         setHeader(request);
         setFileName(request);
     }
-    
+
     private void setHeader(Request request) {
         this.httpget.addHeader("Referer", request.getUrl().toString());
     }
@@ -57,6 +57,7 @@ public class Download extends Thread {
         } else {
             this.videoName = videoName + "Full";
         }
+
     }
 
 
@@ -69,7 +70,6 @@ public class Download extends Thread {
                     if (entity != null) {
 
                         fileInfo.checkSubsection(directory + "/");
-
                         downloadPath = directory + "/" + this.videoName.replaceAll(":", "") + ".mp4";
 
                         if (fileInfo.checkFilesExists(downloadPath, getFileSize(response))) {
@@ -79,26 +79,26 @@ public class Download extends Thread {
                                 fileInfo.loading(entity.getContent(), new FileOutputStream(new File(downloadPath)), getFileSize(response), videoName);
 
                             } else {
-                               logger.info("get connect length is -1");
+                                logger.info("get connect length is -1");
                             }
                         } else {
-                           logger.info("jump is" + videoName);
+                            logger.info("jump is" + videoName);
                         }
                     } else {
-                       logger.info("not response deta");
+                        logger.info("not response deta");
                     }
                 } else {
-                   logger.info("page status code  is:" + response.getStatusLine().getStatusCode());
+                    logger.info("page status code  is:" + response.getStatusLine().getStatusCode());
                 }
             } finally {
                 response.close();
             }
         } catch (ClientProtocolException ex) {
             // Handle protocol errors
-           logger.info(ex.toString());
+            logger.info(ex.toString());
         } catch (IOException ex) {
             // Handle I/O errors
-           logger.info(ex.toString());
+            logger.info(ex.toString());
         }
     }
 }

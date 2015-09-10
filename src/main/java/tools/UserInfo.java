@@ -2,11 +2,14 @@ package tools;
 
 import PornHub.PornHub;
 import hunantv.HunanSpider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import porn91.Porn91;
 import sohu.SohuSpider;
 import us.codecraft.webmagic.processor.PageProcessor;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +21,12 @@ public class UserInfo {
     private static BufferedReader br = null;
     private static List<String> info = null;
     private static String path = null;
+    private static String dirPath = null;
     private static List<String> result = new ArrayList<String>();
     private static PageProcessor platform = null;
+    private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-    public static PageProcessor getPlatform(String data) {
+    public  PageProcessor getPlatform(String data) {
         if (data.contains("sohu")) {
             platform = new SohuSpider();
         } else if (data.contains("hunantv")) {
@@ -36,10 +41,9 @@ public class UserInfo {
         return platform;
     }
 
-    public static List<String> getUserInfo() {
+    public  List<String> getUserInfo() {
         try {
-            path = "E:/test/info";
-//            path = getFilePath() + "info.txt";
+            path = getDriverMaxSpace() + "/info";
             info = new ArrayList<String>();
             in = new FileReader(path);
             br = new BufferedReader(in);
@@ -57,16 +61,30 @@ public class UserInfo {
         return info;
     }
 
-    public static String getFilePath() {
-        String path = System.getProperty("java.class.path");
-        int firstIndex = path.lastIndexOf(System.getProperty("path.separator")) + 1;
-        int lastIndex = path.lastIndexOf(File.separator) + 1;
-        path = path.substring(firstIndex, lastIndex);
-        return "E:/test/";
-//        return path;
+    public  String getDriverMaxSpace() {
+        String os = System.getProperty("os.name");
+        if (os.contains("Windows")) {
+            int max = 0;
+            File[] roots = File.listRoots();
+            for (int i = 0; i < roots.length; i++) {
+                long spaceSize = roots[0].getFreeSpace();
+                if (roots[i].getFreeSpace() > spaceSize) {
+                    spaceSize = roots[i].getFreeSpace();
+                    max = i;
+                    continue;
+                }
+                dirPath = roots[max].getPath() + "video";
+            }
+        } else {
+            //linux
+
+        }
+        new FileInfo().checkSubsection(dirPath);
+        logger.info("use dir path is : " + dirPath);
+        return dirPath;
     }
 
-    public static List<String> Urls() {
+    public  List<String> Urls() {
         for (String s : getUserInfo()) {
             if (s.contains("http")) {
                 result.add(s);

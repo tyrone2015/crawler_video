@@ -31,20 +31,25 @@ public class OutputVideo extends FilePersistentBase implements Pipeline {
             logger.info("jump not videoName url");
             return;
         }
-        directory = resultItems.getRequest().getExtra("videoName").toString().replaceAll(" ", "");
-        Download download = null;
-        for (Map.Entry<String, Object> entry : resultItems.getAll().entrySet()) {
-            if (entry.getValue() instanceof Iterable) {
-                Iterable value = (Iterable) entry.getValue();
-                for (Object o : value) {
-                    download = new Download((Request) o, getPath() + directory, entry.getKey());
-                    RunSpider.pool.execute(download);
+//        synchronized (this) {
+            directory = resultItems.getRequest().getExtra("videoName").toString().replaceAll(" ", "");
+
+            Download download = null;
+            for (Map.Entry<String, Object> entry : resultItems.getAll().entrySet()) {
+                if (entry.getValue() instanceof Iterable) {
+                    Iterable value = (Iterable) entry.getValue();
+                    for (Object o : value) {
+                        logger.warn("[for]"+directory + entry.getKey());
+                        download = new Download((Request) o, getPath() + directory, entry.getKey());
+                        RunSpider.myPool.execute(download);
+                    }
+                } else {
+                    logger.warn(directory + entry.getKey());
+                    download = new Download((Request) entry.getValue(), getPath() + directory, entry.getKey());
+                    RunSpider.myPool.execute(download);
                 }
-            } else {
-                download = new Download((Request) entry.getValue(), getPath() + directory, entry.getKey());
-                RunSpider.pool.execute(download);
             }
         }
     }
-}
+//}
 
