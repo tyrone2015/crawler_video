@@ -15,8 +15,8 @@ import java.util.concurrent.Executors;
  */
 public class RunSpider {
 
-    private static Spider video = null;
-    public static ExecutorService myPool = Executors.newFixedThreadPool(5);//设置下载线程数
+    public static Spider video = null;
+    public static ExecutorService myPool = Executors.newFixedThreadPool(20);//设置下载线程数
 
     public static void main(String[] args) throws JMException {
         UserInfo info = new UserInfo();
@@ -25,7 +25,7 @@ public class RunSpider {
                     .addUrl(info.Urls().toArray(new String[info.Urls().size()]))
                     .addPipeline(new OutputVideo(info.getDriverMaxSpace()));
             SpiderMonitor.instance().register(video);
-            video.thread(5).run();
+            video.setExecutorService(myPool).run();
         } else {
             video = Spider.create(info.getPlatform(args[0]))
                     .addUrl(args)
@@ -34,6 +34,7 @@ public class RunSpider {
             SpiderMonitor.instance().register(video);
             video.run();
         }
+
     }
 
 }

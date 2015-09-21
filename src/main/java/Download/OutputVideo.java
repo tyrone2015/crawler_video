@@ -39,12 +39,10 @@ public class OutputVideo extends FilePersistentBase implements Pipeline {
                 if (entry.getValue() instanceof Iterable) {
                     Iterable value = (Iterable) entry.getValue();
                     for (Object o : value) {
-                        logger.warn("[for]"+directory + entry.getKey());
                         download = new Download((Request) o, getPath() + directory, entry.getKey());
                         RunSpider.myPool.execute(download);
                     }
                 } else {
-                    logger.warn(directory + entry.getKey());
                     download = new Download((Request) entry.getValue(), getPath() + directory, entry.getKey());
                     RunSpider.myPool.execute(download);
                 }

@@ -1,5 +1,6 @@
 package Download;
 
+import RunSpider.RunSpider;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -100,5 +101,6 @@ public class Download extends Thread {
             // Handle I/O errors
             logger.info(ex.toString());
         }
+
     }
 }
