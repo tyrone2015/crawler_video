@@ -19,9 +19,9 @@ public class RunSpider {
 
     public static void main(String[] args) throws JMException {
         UserInfo info = new UserInfo();
-//        String[] url = info.getUserInputUrls();
-        String url="http://tv.sohu.com/item/MTE5MjIzMw==.html";
-        video = Spider.create(info.getPlatform(url))
+        String[] url = info.getUserInputUrls();
+//        String url="http://tv.sohu.com/item/MTE5MjIzMw==.html";
+        video = Spider.create(info.getPlatform(url[0]))
                 .addUrl(url)
                 .addPipeline(new OutputVideo(info.getDriverMaxSpace()));
         SpiderMonitor.instance().register(video);
