@@ -89,8 +89,8 @@ public class UserInfo {
         } else {
             //linux df -m |awk 'NR>1{print $1,$4}'
             BufferedReader br = null;
-            String[] shell = new String[]{"sh", "-c", "df -m |awk 'NR>1{print $1\",\"$4}'"};
-            Map<Integer, String> result = new HashMap<Integer, String>();
+            String[] shell = new String[]{"sh", "-c", "df -m |awk 'NR>1{print $6\",\"$4}'"};
+            Map<String, String> result = new HashMap<String, String>();
 
             try {
                 Process process = Runtime.getRuntime().exec(shell);
@@ -98,7 +98,7 @@ public class UserInfo {
                 br = new BufferedReader(new InputStreamReader(process.getInputStream(), "GBK"));
                 String line = null;
                 while ((line = br.readLine()) != null) {
-                    result.put(Integer.valueOf(line.split(",")[1].replaceAll(",","")), line.split(",")[0]);
+                    result.put(line.split(",")[1].replaceAll(",",""), line.split(",")[0]);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -106,12 +106,12 @@ public class UserInfo {
                 e.printStackTrace();
             }
             long max = 0;
-            for (Map.Entry<Integer, String> entry : result.entrySet()) {
-                if (entry.getKey() > max) {
-                    max = entry.getKey();
+            for (Map.Entry<String, String> entry : result.entrySet()) {
+                if (Integer.valueOf(entry.getKey()) > max) {
+                    max = Integer.valueOf(entry.getKey());
                 }
             }
-            dirPath = dirPath+result.get(max)+ "video";
+            dirPath = result.get(String.valueOf(max))+ "video_linux";
         }
         new FileInfo().checkSubsection(dirPath);
         logger.info("use dir path is : " + dirPath);
