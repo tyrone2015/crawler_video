@@ -8,25 +8,29 @@ import porn91.Porn91;
 import sohu.SohuSpider;
 import us.codecraft.webmagic.processor.PageProcessor;
 
-import java.io.*;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Created by tailong on 2015/6/11.
  */
 public class UserInfo {
-    private static Reader in;
-    private static BufferedReader br = null;
-    private static List<String> info = null;
-    private static String path = null;
     private static String dirPath = null;
-    private static List<String> result = new ArrayList<String>();
     private static PageProcessor platform = null;
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-    public  PageProcessor getPlatform(String data) {
+    /**
+     * 根据URL 实例不同的类
+     *
+     * @param data
+     * @return
+     */
+    public PageProcessor getPlatform(String data) {
         if (data.contains("sohu")) {
             platform = new SohuSpider();
         } else if (data.contains("hunantv")) {
@@ -41,27 +45,35 @@ public class UserInfo {
         return platform;
     }
 
-    public  List<String> getUserInfo() {
-        try {
-            path = getDriverMaxSpace() + "/info";
-            info = new ArrayList<String>();
-            in = new FileReader(path);
-            br = new BufferedReader(in);
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                info.add(line);
-            }
-            br.close();
-            in.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    /**
+     * 获取用户输入的URL
+     *
+     * @return
+     */
+    public String[] getUserInputUrls() {
+        String[] result = null;
+        System.out.println("please input link, if your input String contains more link, Please add ','to the link between");
+        Scanner sc = new Scanner(System.in);
+        String url = sc.nextLine();
+        if (url.isEmpty()) {
+            System.out.println("url is empty, spider exit.");
+            System.exit(-1);
         }
-        return info;
+        if (url.contains(",")) {
+            result = url.split(",");
+        } else {
+            result = new String[1];
+            result[0] = url;
+        }
+        return result;
     }
 
-    public  String getDriverMaxSpace() {
+    /**
+     * 获取系统最大剩余空间的分区
+     *
+     * @return
+     */
+    public String getDriverMaxSpace() {
         String os = System.getProperty("os.name");
         if (os.contains("Windows")) {
             int max = 0;
@@ -69,28 +81,41 @@ public class UserInfo {
             for (int i = 0; i < roots.length; i++) {
                 long spaceSize = roots[0].getFreeSpace();
                 if (roots[i].getFreeSpace() > spaceSize) {
-                    spaceSize = roots[i].getFreeSpace();
                     max = i;
                     continue;
                 }
                 dirPath = roots[max].getPath() + "video";
             }
         } else {
-            //linux
+            //linux df -m |awk 'NR>1{print $1,$4}'
+            BufferedReader br = null;
+            String[] shell = new String[]{"sh", "-c", "df -m |awk 'NR>1{print $1\",\"$4}'"};
+            Map<Integer, String> result = new HashMap<Integer, String>();
 
+            try {
+                Process process = Runtime.getRuntime().exec(shell);
+                process.waitFor();
+                br = new BufferedReader(new InputStreamReader(process.getInputStream(), "GBK"));
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    result.put(Integer.valueOf(line.split(",")[1].replaceAll(",","")), line.split(",")[0]);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            long max = 0;
+            for (Map.Entry<Integer, String> entry : result.entrySet()) {
+                if (entry.getKey() > max) {
+                    max = entry.getKey();
+                }
+            }
+            dirPath = dirPath+result.get(max)+ "video";
         }
         new FileInfo().checkSubsection(dirPath);
         logger.info("use dir path is : " + dirPath);
         return dirPath;
-    }
-
-    public  List<String> Urls() {
-        for (String s : getUserInfo()) {
-            if (s.contains("http")) {
-                result.add(s);
-            }
-        }
-        return result;
     }
 
 

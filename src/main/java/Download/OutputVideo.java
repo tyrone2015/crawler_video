@@ -31,9 +31,8 @@ public class OutputVideo extends FilePersistentBase implements Pipeline {
             logger.info("jump not videoName url");
             return;
         }
-//        synchronized (this) {
+        synchronized (this) {
             directory = resultItems.getRequest().getExtra("videoName").toString().replaceAll(" ", "");
-
             Download download = null;
             for (Map.Entry<String, Object> entry : resultItems.getAll().entrySet()) {
                 if (entry.getValue() instanceof Iterable) {
@@ -49,5 +48,4 @@ public class OutputVideo extends FilePersistentBase implements Pipeline {
             }
         }
     }
-//}
-
+}

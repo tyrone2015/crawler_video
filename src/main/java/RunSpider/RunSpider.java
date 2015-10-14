@@ -1,6 +1,5 @@
 package RunSpider;
 
-import Download.OutputUlr;
 import Download.OutputVideo;
 import tools.UserInfo;
 import us.codecraft.webmagic.Spider;
@@ -20,21 +19,15 @@ public class RunSpider {
 
     public static void main(String[] args) throws JMException {
         UserInfo info = new UserInfo();
-        if (args.length == 0) {
-            video = Spider.create(info.getPlatform(info.getUserInfo().get(0)))
-                    .addUrl(info.Urls().toArray(new String[info.Urls().size()]))
-                    .addPipeline(new OutputVideo(info.getDriverMaxSpace()));
-            SpiderMonitor.instance().register(video);
-            video.setExecutorService(myPool).run();
-        } else {
-            video = Spider.create(info.getPlatform(args[0]))
-                    .addUrl(args)
-                    .addPipeline(new OutputUlr(info.getDriverMaxSpace()))
-                    .addPipeline(new OutputVideo(info.getDriverMaxSpace()));
-            SpiderMonitor.instance().register(video);
-            video.run();
-        }
-
+//        String[] url = info.getUserInputUrls();
+        String url="http://tv.sohu.com/item/MTE5MjIzMw==.html";
+        video = Spider.create(info.getPlatform(url))
+                .addUrl(url)
+                .addPipeline(new OutputVideo(info.getDriverMaxSpace()));
+        SpiderMonitor.instance().register(video);
+        video.run();
+        myPool.shutdown();
+        System.out.println("thread is shutdown ...........");
     }
 
 }

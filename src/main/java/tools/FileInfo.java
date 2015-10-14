@@ -56,22 +56,26 @@ public class FileInfo {
      * @param fileSize
      * @param videoName
      */
-    public synchronized void loading(InputStream in, OutputStream out, double fileSize, String videoName) {
+    public  synchronized   void loading(InputStream in, OutputStream out, double fileSize, String videoName) {
         byte[] buffer = new byte[10240];
         int readLength = 0;
         double downloadSize = 0;
+        int outputTime=0;
         try {
             while ((readLength = in.read(buffer)) > 0) {
                 downloadSize += readLength;
                 out.write(buffer, 0, readLength);
                 out.flush();
-//                System.out.print('\r');
-                logger.info(Thread.currentThread().getName() + "download thread");
-                logger.info(videoName + "\t" + String.format("%.2f", downloadSize / fileSize * 100) + "%");//downloadSize / fileSize * 100
+                if(outputTime==1000) {
+                    logger.info(videoName + "\t" + String.format("%.2f", downloadSize / fileSize * 100) + "%");//downloadSize / fileSize * 100
+                    outputTime=0;
+                }
+                outputTime++;
             }
             in.close();
             out.close();
         } catch (IOException e) {
+
             logger.warn(Thread.currentThread().getName() + "Thread is warn");
             e.printStackTrace();
         }
